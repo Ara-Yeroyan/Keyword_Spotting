@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 def decode_audio(audio_binary):
   audio, _ = tf.audio.decode_wav(audio_binary)
@@ -47,14 +48,11 @@ def plot_spectrogram(spectrogram, ax):
   #ax.colorbar()
 
 
-def get_spectrogram_and_label_id(audio, no_label = False):
+def get_spectrogram_and_label_id(wav, label):
   labels = ['no' , 'noise', 'unknown', 'yes']
-  waveform, label = get_waveform_and_label(audio)
-  #label = label.numpy().decode('utf-8')
-  spectrogram = get_spectrogram(waveform)
+  spectrogram = get_spectrogram(wav)
   spectrogram = tf.expand_dims(spectrogram, -1)
-  if no_label: label_id = None
-  else: label_id = np.argmax(label.decode('utf-8') == labels)
+  label_id = tf.argmax(label == labels)
   return spectrogram, label_id
 
 def preprocess_dataset(files):

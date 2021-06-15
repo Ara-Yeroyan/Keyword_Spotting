@@ -2,6 +2,7 @@ import numpy as np
 import librosa
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
 
 def read_audio(audio_path):
   audio, rate = librosa.load(audio_path, 16000)
@@ -45,7 +46,6 @@ def plot_signals(audios, random = 0):
     #fig.suptitle('Time Series', size= 20)
     for y in range(4):
       wav, label = get_waveform_and_label_numpy(audios[(1500*y-1)-30*random])
-      label = label.numpy().decode('utf-8')
       axes[y].set_title(label, family ='serif');
       axes[y].plot(wav)
       axes[y].get_xaxis().set_visible(False)
@@ -101,7 +101,7 @@ def visualise_spectogram_data(rows, cols, audios):
     r = i // cols
     c = i % cols
     ax = axes[r][c]
-    plot_spectrogram(spectrogram, ax)
+    plot_spectrogram_scipy(spectrogram, ax)
     ax.set_title(label)
     ax.axis('off')
     
