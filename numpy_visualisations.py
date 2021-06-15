@@ -9,10 +9,14 @@ def read_audio(audio_path):
   assert rate == 16000
   return audio
 
+#visualise_spectogram_data(3, 7, audios)
 import regex as re
 def extract_label(file_path):
     pattern = r'\w+'
     res = re.findall(pattern, file_path)
+    if 'drive' in file_path:
+      idx = res.index('PodCastle')
+      res = res[idx+2:]
     return res[0]  # working with tensorflow graph
 
 def get_waveform_and_label_numpy(file_path):
