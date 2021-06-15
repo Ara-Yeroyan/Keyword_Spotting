@@ -15,6 +15,7 @@ import tensorflow as tf
 from preprocessing import *
 from load_model import *
 from record_audio import *
+from numpy_visualisations import *
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ['CUDA_VISIBLE_DEVICES'] = "0"
@@ -37,10 +38,13 @@ def loading_model():
 	return model
 
 def analysis(signal, r = 16000, label = 'recording'):
-			raw = tf.convert_to_tensor(signal)
+			#raw = tf.convert_to_tensor(signal)
 			#waveform, label = get_waveform_and_label(uploaded_file, True)
-			spectrogram = get_spectrogram(raw)
-			log_spec = np.log(spectrogram.numpy().T)
+			if type(signal) == np.ndarray:
+				signal = tf.convert_to_tensor(signal, tf.float32)
+			spectrogram = get_spectrogram(signal)
+			spectrogram = spectrogram.numpy().T
+			log_spec = np.log(spectrogram) # to bring back 124 x 129
 
 			if st.checkbox('Raw Data'):
 				time = r / 16000
@@ -64,7 +68,7 @@ def analysis(signal, r = 16000, label = 'recording'):
 				# axes[0].plot(timescale, signal)
 				# axes[0].set_title('Waveform')
 				# axes[0].set_xlim([0, 16000])
-				plot_spectrogram(spectrogram.numpy(), plt)
+				plot_spectrogram_scipy(spectrogram, plt)
 				plt.title(label)
 				plt.show()	
 				st.pyplot()
@@ -74,7 +78,7 @@ def analysis(signal, r = 16000, label = 'recording'):
 				model = loading_model()
 				st.write('Succesfully loaded the model !')
 				decoding = ['no' , 'noise', 'unknown', 'yes']
-				batch = spectrogram.numpy().reshape(1, spectrogram.shape[0], spectrogram.shape[1], 1)
+				batch = spectrogram.reshape(1, spectrogram.shape[0], spectrogram.shape[1], 1)
 				pred = model.predict_classes(batch)
 				pred_text = decoding[pred[0]]
 				#print(type(pred.value))
@@ -104,12 +108,12 @@ if navigation != 'Upload a ".wav" file':
 		df = pd.read_csv('track.csv')
 		tracker = df.iloc[0, 0]
 		if tracker == 0:
-			df.iloc[0, 0] =  1
 			signal = record()
 			df.iloc[0, 1:] = signal
 			st.subheader('Inspect your recording !')
 			st.write('Waveform shape:', signal.shape)
 			st.audio('recording.wav')
+			df.iloc[0, 0] =  1
 			df.to_csv('track.csv', index = False)
 			#from IPython import display	
 			#display.display(display.Audio(signal, rate=16000))

@@ -10,7 +10,7 @@ def record():
 					samplerate=freq, channels=1)
 
 	sd.wait()
-	write("recording.wav", freq, recording)
+	wv.write("recording.wav", recording, freq, sampwidth=1)
 	signal, rate = librosa.load("recording.wav", freq)
 	return signal
 
