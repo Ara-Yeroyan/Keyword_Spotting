@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 import streamlit as st
 st.set_option('deprecation.showPyplotGlobalUse', False)
 import io, warnings, sys, os
@@ -24,9 +25,6 @@ print(gpus)
 if len(gpus) > 0:
     tf.config.experimental.set_memory_growth(gpus[0], True)
 else:  print('working on CPU')
-
-from inference import inspection
-import matplotlib.pyplot as plt
 
 
 import tensorflow.keras.backend as K
