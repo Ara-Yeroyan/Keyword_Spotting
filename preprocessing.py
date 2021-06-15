@@ -6,8 +6,8 @@ def decode_audio(audio_binary):
   audio, _ = tf.audio.decode_wav(audio_binary)
   return tf.squeeze(audio, axis=-1)
 
-def get_label(file_path, local = True):
-  if not local:
+def get_label(file_path, colab = True):
+  if colab:
     parts = tf.strings.split(file_path, os.path.sep)[-2]
   else:
     parts = tf.strings.split(file_path.split('/')[-2]).numpy()[0]
