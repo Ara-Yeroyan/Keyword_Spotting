@@ -31,13 +31,13 @@ def get_spectrogram(waveform):
   
   spectrogram = tf.abs(spectrogram)
 
-  return spectrogram
+  return tf.transpose(spectrogram)
 
 def plot_spectrogram(spectrogram, ax):
   # Convert to frequencies to log scale and transpose so that the time is
   # represented in the x-axis (columns).
-  spectrogram = spectrogram.reshape((124, 129))
-  log_spec = np.log(spectrogram.T)
+  #spectrogram = spectrogram.reshape((124, 129))
+  log_spec = np.log(spectrogram)
   print(f'log spec shape: {log_spec.shape}')
   height = log_spec.shape[0]
   width = log_spec.shape[1]

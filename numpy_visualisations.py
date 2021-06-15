@@ -89,16 +89,20 @@ def plot_log_spectograms(path_to_audios):
     axs[i].set_title(path_to_audios[np.random.randint(6036)].split('/')[-1])
     plt.colorbar(z, ax = axs[i])
 
-def visualise_spectogram_data(rows, cols, spectrogram_ds):
+def visualise_spectogram_data(rows, cols, audios):
   labels = ['no' , 'noise', 'unknown', 'yes']
   n = rows*cols
   fig, axes = plt.subplots(rows, cols, figsize=(25, 6))
-  for i, (spectrogram, label_id) in enumerate(spectrogram_ds.take(n)):
+  for i in range(n):
+    idx = np.random.randint(len(audios))
+    target = audios[i]
+    waveform, label = get_waveform_and_label_numpy(target)
+    spectrogram = get_spectrogram_scipy(waveform)
     r = i // cols
     c = i % cols
     ax = axes[r][c]
-    plot_spectrogram(np.squeeze(spectrogram.numpy()), ax)
-    ax.set_title(labels[label_id.numpy()])
+    plot_spectrogram(spectrogram, ax)
+    ax.set_title(label)
     ax.axis('off')
     
   plt.show()
