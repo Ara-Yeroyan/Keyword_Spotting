@@ -21,11 +21,9 @@ def get_waveform_and_label(file_path, no_label = False):
   return waveform, label
 
 def get_spectrogram(waveform):
-  # Padding for files with less than 16000 samples
+  # Padding for files with less than 1 second
   zero_padding = tf.zeros([16000] - tf.shape(waveform), dtype=tf.float32)
 
-  # Concatenate audio with padding so that all audio clips will be of the 
-  # same length
   waveform = tf.cast(waveform, tf.float32)
   equal_length = tf.concat([waveform, zero_padding], 0)
   spectrogram = tf.signal.stft(
@@ -34,17 +32,6 @@ def get_spectrogram(waveform):
   spectrogram = tf.abs(spectrogram)
 
   return spectrogram
-
-
-def get_spectrogram_and_label_id(audio, no_label = False):
-  labels = ['no' , 'noise', 'unknown', 'yes']
-  waveform, label = get_waveform_and_label(audio)
-  #label = label.numpy().decode('utf-8')
-  spectrogram = get_spectrogram(waveform)
-  spectrogram = tf.expand_dims(spectrogram, -1)
-  if no_label: label_id = None
-  else: label_id = np.argmax(label.decode('utf-8') == labels)
-  return spectrogram, label_id
 
 def plot_spectrogram(spectrogram, ax):
   # Convert to frequencies to log scale and transpose so that the time is
@@ -59,20 +46,28 @@ def plot_spectrogram(spectrogram, ax):
   ax.pcolormesh(X, Y, log_spec)
   #ax.colorbar()
 
-def calc_fft(signal, rate = 16000):
 
-  n = len(signal)
-  # rfft for avoining "Hamaluster"  (Complex numbers are included)
-  freq = np.fft.rfftfreq(n, d=1/rate)  # d -> the spacing between each individual samples
-  y = abs(np.fft.rfft(signal)/n) # abs -> for getting the magnitude (in complex numbers sqrt(Re**2 + Im**2))  -> spectrum
-  return (y, freq)
+def get_spectrogram_and_label_id(audio, no_label = False):
+  labels = ['no' , 'noise', 'unknown', 'yes']
+  waveform, label = get_waveform_and_label(audio)
+  #label = label.numpy().decode('utf-8')
+  spectrogram = get_spectrogram(waveform)
+  spectrogram = tf.expand_dims(spectrogram, -1)
+  if no_label: label_id = None
+  else: label_id = np.argmax(label.decode('utf-8') == labels)
+  return spectrogram, label_id
+
+def preprocess_dataset(files):
+  files_ds = tf.data.Dataset.from_tensor_slices(files)
+  output_ds = files_ds.map(get_waveform_and_label, num_parallel_calls=AUTOTUNE)
+  output_ds = output_ds.map(
+      get_spectrogram_and_label_id,  num_parallel_calls=AUTOTUNE)
+  return output_ds
 
 
-def plot_fft(signal, rate = 16000):
 
-  Y, freq = calc_fft(signal, rate)
-  plt.plot(freq, Y)
-  plt.title('Fourier Domain')
-  #plt.get_yaxis().set_visible(False)
-  plt.show()
+
+
+
+
 
