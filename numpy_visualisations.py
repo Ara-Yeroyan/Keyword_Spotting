@@ -20,7 +20,6 @@ def get_waveform_and_label_numpy(file_path):
   return waveform, label
 
 
-
 def calc_fft(signal, rate = 16000):
 
   n = len(signal)
@@ -39,20 +38,21 @@ def plot_fft(signal, rate = 16000):
   #plt.get_yaxis().set_visible(False)
   plt.show()
 
+
 def plot_signals(audios, random = 0):
     fig, axes = plt.subplots(nrows=1, ncols=4, sharex=False,
                              sharey=True, figsize=(25, 1))
     #fig.suptitle('Time Series', size= 20)
     for y in range(4):
-      wav, label = get_waveform_and_label(audios[(1500*y-1)-30*random])
+      wav, label = get_waveform_and_label_numpy(audios[(1500*y-1)-30*random])
       label = label.numpy().decode('utf-8')
       axes[y].set_title(label, family ='serif');
       axes[y].plot(wav)
       axes[y].get_xaxis().set_visible(False)
       axes[y].get_yaxis().set_visible(False)
-
-import scipy
+     
 def get_spectrogram_scipy(waveform : np.array):
+  import scipy
   # Padding for files with less than 16000 samples
   zero_padding = np.zeros(16000 - waveform.shape[0], dtype=np.float32)
 
